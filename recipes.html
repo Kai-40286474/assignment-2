@@ -12,11 +12,28 @@
         <h1>Welcome to Student spoon</h1>
     </header>
     <div>
+        <a href="main page.html"><button class="buttons">main page</button></a>
         <a href="recipes.html" ><button class="buttons">recipes</button></a>
-        <a href="meal-plans.html"><button class="buttons">meal plans</button></a>
         <a href="about-us.html"><button class="buttons">About Us</button></a>
         <a href="contact-us.html"><button class="buttons">Contact Us</button></a>
     </div>
+    <div>
+        <h1>create recipe</h1>
+        <form onsumbmit="handleRecipeFormSubmit(event)">
+            <input name="recipeName" placeholder="Recipe Name" class="input-field" required>
+            <input name="recipeImage" placeholder="Image URL" class="input-field" required>
+            <input name="recipeTitle" placeholder="Recipe Title" class="input-field" required>
+            <input name="recipeTime" placeholder="Cooking Time (e.g., 30 mins)" class="input-field" required>
+            <input name="recipeServings" placeholder="Servings (e.g., 4)" class="input-field" required>
+            <input name="recipeRating" type="number" min="0" max="5" placeholder="Rating (0-5)" class="input-field" required>
+            <textarea name="recipeDescription" placeholder="Recipe Description" class="input-field" required></textarea>
+            <button type="submit">Create Recipe</button>
+        </form>
+        <div class="recipe-container" id="recipeContainer">
+        <!-- Recipe cards will be dynamically added here -->
+        </div>
+    </div>
+   
 </body>
 
 </html>
