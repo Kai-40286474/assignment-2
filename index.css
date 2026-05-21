@@ -127,9 +127,19 @@ header{
             display: flex;
             flex-direction: column;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 50px;
             justify-content: center;
         }
+#about-us{
+    display: flex;
+    flex-direction: column;
+    background: var(--secondary-color);
+    border:var(--secondary-color) solid 1px;
+    color: white;
+    padding: 20px 50px;
+    border-radius: 8px;
+    align-items: center;
+}
 
 
 
