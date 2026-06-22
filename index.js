@@ -164,7 +164,7 @@ function loadRecipesFromStorage(containerId = 'recipes-container') {
   console.log(`Loaded ${recipes.length} recipes from storage`);
 }
 
-// Example usage with form input (can be adapted for your needs)
+
 function handleRecipeFormSubmit(event) {
   event.preventDefault();
 
