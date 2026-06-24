@@ -10,7 +10,10 @@ class Recipe {
     this.rating = rating;
   }
 }
-
+// Track current search term
+let currentSearchTerm = '';
+// Alias so renderRecipes can call createCard
+const createCard = generateRecipeCard;
 // Create a new recipe card from user input
 function createRecipeInput(recipeName, recipeImage, recipeTitle, recipeDescription, recipeTime, recipeServings, recipeRating = 0) {
   // Validate input
@@ -18,14 +21,11 @@ function createRecipeInput(recipeName, recipeImage, recipeTitle, recipeDescripti
     console.error('Error: All recipe fields are required');
     return null;
   }
-
   // Create recipe object
   const recipe = new Recipe(recipeName, recipeImage, recipeTitle, recipeDescription, recipeTime, recipeServings, recipeRating);
-
   // Return the recipe object
   return recipe;
 }
-
 // Generate HTML from recipe data
 function generateRecipeCard(recipe) {
   if (!recipe) {
@@ -41,7 +41,6 @@ function generateRecipeCard(recipe) {
       <h2>${recipe.name}</h2>
       <span>${recipe.rating > 0 ? '⭐'.repeat(recipe.rating) : '⭐'}</span>
     </div>
-
     <!-- Main Content -->
     <div class="recipe-content">
       <img src="${recipe.image}" alt="Recipe" class="recipe-image">
@@ -53,31 +52,26 @@ function generateRecipeCard(recipe) {
         <div class="recipe-meta">
           <span>⏱️ ${recipe.time}</span>
           <span>👥 ${recipe.servings} servings</span>
+          <button class="delete-button" onclick="deleteRecipeFromStorage(${getRecipesFromStorage().indexOf(recipe)})">Delete</button>
         </div>
       </div>
     </div>
   `;
-
   return recipeCard;
 }
-
 // Add recipe card to the DOM
 function addRecipeToPage(recipe, containerId = 'recipes-container') {
   const recipeCard = generateRecipeCard(recipe);
   if (!recipeCard) return;
-
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`Error: Container with ID "${containerId}" not found`);
     return;
   }
-
   container.appendChild(recipeCard);
 }
-
 // Local storage management
 const STORAGE_KEY = 'userRecipes';
-
 function saveRecipeToStorage(recipe) {
   try {
     const recipes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -90,7 +84,7 @@ function saveRecipeToStorage(recipe) {
     return false;
   }
 }
-
+ 
 function getRecipesFromStorage() {
   try {
     const recipes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -100,7 +94,7 @@ function getRecipesFromStorage() {
     return [];
   }
 }
-
+ 
 function clearRecipesFromStorage() {
   try {
     localStorage.removeItem(STORAGE_KEY);
@@ -111,7 +105,7 @@ function clearRecipesFromStorage() {
     return false;
   }
 }
-
+ 
 function deleteRecipeFromStorage(index) {
   try {
     const recipes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -124,7 +118,7 @@ function deleteRecipeFromStorage(index) {
     return false;
   }
 }
-
+ 
 // Complete workflow: Create and add recipe in one function
 function createAndAddRecipe(recipeName, recipeImage, recipeTitle, recipeDescription, recipeTime, recipeServings, recipeRating = 0, containerId = 'recipes-container') {
   const recipe = createRecipeInput(recipeName, recipeImage, recipeTitle, recipeDescription, recipeTime, recipeServings, recipeRating);
@@ -138,7 +132,7 @@ function createAndAddRecipe(recipeName, recipeImage, recipeTitle, recipeDescript
   
   return null;
 }
-
+ 
 // Load all recipes from storage and display them
 function loadRecipesFromStorage(containerId = 'recipes-container') {
   const recipes = getRecipesFromStorage();
@@ -147,7 +141,7 @@ function loadRecipesFromStorage(containerId = 'recipes-container') {
     console.log('No recipes found in storage');
     return;
   }
-
+ 
   recipes.forEach((recipeData) => {
     const recipe = new Recipe(
       recipeData.name,
@@ -160,14 +154,13 @@ function loadRecipesFromStorage(containerId = 'recipes-container') {
     );
     addRecipeToPage(recipe, containerId);
   });
-
+ 
   console.log(`Loaded ${recipes.length} recipes from storage`);
 }
-
-
+ 
 function handleRecipeFormSubmit(event) {
   event.preventDefault();
-
+ 
   const formData = new FormData(event.target);
   const recipe = createAndAddRecipe(
     formData.get('recipeName'),
@@ -178,8 +171,63 @@ function handleRecipeFormSubmit(event) {
     formData.get('recipeServings'),
     parseInt(formData.get('recipeRating')) || 0
   );
-
+ 
   if (recipe) {
     event.target.reset();
   }
 }
+ 
+function getFilteredRecipes(searchTerm = currentSearchTerm) {
+  const recipes = getRecipesFromStorage();
+  const trimmedTerm = searchTerm.trim().toLowerCase();
+ 
+  if (!trimmedTerm) {
+    return recipes;
+  }
+ 
+  return recipes.filter(recipe => recipe.name.toLowerCase().includes(trimmedTerm));
+}
+ 
+function renderRecipes(searchTerm = currentSearchTerm) {
+  const container = document.getElementById('recipes-container');
+  const searchInfo = document.getElementById('search-results-info');
+  if (!container) return;
+ 
+  currentSearchTerm = searchTerm;
+  const recipes = getFilteredRecipes(currentSearchTerm);
+  container.innerHTML = '';
+ 
+  if (searchInfo) {
+    if (currentSearchTerm.trim()) {
+      searchInfo.textContent = `Showing ${recipes.length} result${recipes.length === 1 ? '' : 's'} for "${currentSearchTerm.trim()}".`;
+    } else {
+      searchInfo.textContent = `Showing ${recipes.length} recipe${recipes.length === 1 ? '' : 's'}.`;
+    }
+  }
+ 
+  if (recipes.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = currentSearchTerm.trim()
+      ? `No recipes match "${currentSearchTerm.trim()}". Try another recipe name.`
+      : 'No recipes yet. Upload your own recipe to get started (template)';
+    container.appendChild(emptyMessage);
+    return;
+  }
+ 
+  recipes.forEach(recipe => {
+    container.appendChild(createCard(recipe));
+  });
+}
+ 
+window.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('recipe-search');
+ 
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+      renderRecipes(event.target.value);
+    });
+  }
+ 
+  renderRecipes();
+});
+ 

@@ -11,6 +11,7 @@
     <header id="header">
         <h1>Welcome to Student spoon</h1>
     </header>
+    
     <div>
         <a href="main page.html"><button class="buttons">main page</button></a>
         <a href="recipes.html" ><button class="buttons">recipes</button></a>
@@ -19,11 +20,21 @@
         <a href="contact-us.html"><button class="buttons">Contact Us</button></a>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadRecipesFromStorage('recipes-container');
-        });
-    </script>
+    <div class="container">
+        <div class="search-section" role="search">
+            <label class="search-label">Search recipes by name</label>
+            <div class="search-input-wrapper">
+                
+                <input type="text" id="recipe-search" placeholder="Try "carbonara"" autocomplete="off">
+                <span class="search-icon" aria-hidden="true"></span>
+            </div>
+            <p class="search-results-info" id="search-results-info"></p>
+        </div>
+        
+        <div class="card-alignment" id="recipes-container"></div>
+    </div>
+
+    <script src="index.js"></script>
 </body>
 
 </html>
